@@ -5,7 +5,8 @@ import sys
 class PartyNN(object):
     def __init__(self, learning_rate=0.1):
         self.weights_0_1 = np.random.normal(0.0, 2 ** -0.5, (2, 3))
-        self.weights_1_2 = np.random.normal(0.0, 1, (1, 2))
+        self.weights_1_2 = np.random.normal(0.0, 2 ** -0.5, (2, 2))
+        self.weights_2_3 = np.random.normal(0.0, 1, (1, 2))
         self.sigmoid_mapper = np.vectorize(self.sigmoid)
         self.learning_rate = np.array([learning_rate])
 
@@ -18,7 +19,11 @@ class PartyNN(object):
 
         inputs_2 = np.dot(self.weights_1_2, outputs_1)
         outputs_2 = self.sigmoid_mapper(inputs_2)
-        return outputs_2
+
+        inputs_3 = np.dot(self.weights_2_3, outputs_2)
+        outputs_3 = self.sigmoid_mapper(inputs_3)
+
+        return outputs_3
 
     def training(self, inputs, expected_predict):
         inputs_1 = np.dot(self.weights_0_1, inputs)
@@ -26,17 +31,27 @@ class PartyNN(object):
 
         inputs_2 = np.dot(self.weights_1_2, outputs_1)
         outputs_2 = self.sigmoid_mapper(inputs_2)
-        actual_predict = outputs_2[0]
 
-        error_layer_2 = np.array([actual_predict - expected_predict])
-        gradient_layer_2 = actual_predict * (1 - actual_predict)
+        inputs_3 = np.dot(self.weights_2_3, outputs_2)
+        outputs_3 = self.sigmoid_mapper(inputs_3)
+
+        actual_predict = outputs_3[0]
+
+        error_layer_3 = np.array([actual_predict - expected_predict])
+        gradient_layer_3 = actual_predict * (1 - actual_predict)
+        weights_delta_layer_3 = error_layer_3 * gradient_layer_3
+        self.weights_2_3 -= (np.dot(weights_delta_layer_3, outputs_2.reshape(1, len(outputs_2)))) * self.learning_rate
+
+        error_layer_2 = weights_delta_layer_3 * self.weights_2_3
+        gradient_layer_2 = outputs_2 * (1 - outputs_2)
         weights_delta_layer_2 = error_layer_2 * gradient_layer_2
-        self.weights_1_2 -= (np.dot(weights_delta_layer_2, outputs_1.reshape(1, len(outputs_1)))) * self.learning_rate
+        smth = np.dot(weights_delta_layer_2, outputs_1.reshape(1, len(outputs_1)))
+        self.weights_1_2 -= smth * self.learning_rate
 
         error_layer_1 = weights_delta_layer_2 * self.weights_1_2
         gradient_layer_1 = outputs_1 * (1 - outputs_1)
         weights_delta_layer_1 = error_layer_1 * gradient_layer_1
-        self.weights_0_1 -= (np.dot(inputs.reshape(len(inputs), 1), weights_delta_layer_1).T * self.learning_rate)
+        self.weights_0_1 -= np.dot(inputs.reshape(len(inputs), 1), weights_delta_layer_1).T * self.learning_rate
 
 
 def mse(y, Y):
@@ -55,6 +70,11 @@ epochs = 9000
 learning_rate = 0.7
 
 network = PartyNN(learning_rate=learning_rate)
+
+# print('0_1: ' + str(network.weights_0_1) + '\n')
+# print('1_2: ' + str(network.weights_1_2) + '\n')
+# print('2_3: ' + str(network.weights_2_3) + '\n')
+
 
 for e in range(epochs):
     inputs_ = []
