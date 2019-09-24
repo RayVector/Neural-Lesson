@@ -2,7 +2,7 @@ import numpy as np
 import sys
 
 
-class PartyNN(object):
+class Brain(object):
     def __init__(self, learning_rate=0.1):
         self.weights_0_1 = np.random.normal(0.0, 2 ** -0.5, (2, 3))
         self.weights_1_2 = np.random.normal(0.0, 1, (1, 2))
@@ -43,18 +43,18 @@ def mse(y, Y):
     return np.mean((y - Y) ** 2)
 
 
+epochs = 8000
+learning_rate = 0.08
+
 train = [
-    ([0, 0, 0], 0),
+    ([0, 1, 0], 0),
     ([1, 1, 1], 1),
-    ([1, 0, 1], 1),
+    ([1, 0, 1], 0),
     ([1, 1, 1], 1),
-    ([1, 0, 0], 1),
 ]
 
-epochs = 9000
-learning_rate = 0.7
 
-network = PartyNN(learning_rate=learning_rate)
+network = Brain(learning_rate=learning_rate)
 
 for e in range(epochs):
     inputs_ = []
@@ -84,3 +84,55 @@ for input_stat, correct_predict in train:
         str(network.predict(np.array(input_stat))),
         str(int(correct_predict == 1))
     ))
+
+print("\n")
+
+
+train2 = [
+    ([0, 1, 0], 0),
+    ([1, 1, 1], 1),
+    ([1, 0, 0], 0),
+    ([1, 0, 1], 0),
+]
+
+
+for e in range(epochs):
+    inputs_ = []
+    correct_predictions = []
+    for input_stat, correct_predict in train2:
+        network.training(np.array(input_stat), correct_predict)
+        inputs_.append(np.array(input_stat))
+        correct_predictions.append(np.array(correct_predict))
+
+    train_loss = mse(network.predict(np.array(inputs_).T), np.array(correct_predictions))
+    sys.stdout.write(
+        "\rNewData. Progress: {}, Training loss: {}".format(str(100 * e / float(epochs))[:4], str(train_loss)[:5]))
+
+print("\n")
+
+for input_stat, correct_predict in train2:
+    print("NewData. For input: {} the prediction is: {}, expected: {}".format(
+        str(input_stat),
+        str(int(network.predict(np.array(input_stat)) > .5)),
+        str(int(correct_predict == 1))
+    ))
+
+print("\n")
+
+for input_stat, correct_predict in train2:
+    print("NewData. For input: {} the prediction is: {}, expected: {}".format(
+        str(input_stat),
+        str(network.predict(np.array(input_stat))),
+        str(int(correct_predict == 1))
+    ))
+
+print("\n")
+
+
+# train3 = [
+#     ([0, 0, 0], 0),
+#     ([1, 0, 1], 1),
+#     ([1, 1, 1], 1),
+#     ([1, 0, 0], 0),
+#     ([0, 0, 1], 1),
+# ]
