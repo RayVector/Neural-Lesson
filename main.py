@@ -6,6 +6,7 @@ class Brain(object):
     def __init__(self, learning_rate=0.1):
         self.weights_0_1 = np.random.normal(0.0, 2 ** -0.5, (2, 3))
         self.weights_1_2 = np.random.normal(0.0, 1, (1, 2))
+
         self.sigmoid_mapper = np.vectorize(self.sigmoid)
         self.learning_rate = np.array([learning_rate])
 
@@ -46,121 +47,50 @@ def mse(y, Y):
 epochs = 8000
 learning_rate = 0.08
 
-train = [
-    ([0, 1, 0], 0),
-    ([1, 1, 1], 1),
-    ([1, 0, 1], 0),
-    ([1, 1, 1], 1),
-]
-
 network = Brain(learning_rate=learning_rate)
 
-for e in range(epochs):
-    inputs_ = []
-    correct_predictions = []
-    for input_stat, correct_predict in train:
-        network.training(np.array(input_stat), correct_predict)
-        inputs_.append(np.array(input_stat))
-        correct_predictions.append(np.array(correct_predict))
-
-    train_loss = mse(network.predict(np.array(inputs_).T), np.array(correct_predictions))
-    sys.stdout.write("\rProgress: {}, Training loss: {}".format(str(100 * e / float(epochs))[:4], str(train_loss)[:5]))
-
-print("\n")
-
-for input_stat, correct_predict in train:
-    print("For input: {} the prediction is: {}, expected: {}".format(
-        str(input_stat),
-        str(int(network.predict(np.array(input_stat)) > .5)),
-        str(int(correct_predict == 1))
-    ))
-
-print("\n")
-
-for input_stat, correct_predict in train:
-    print("For input: {} the prediction is: {}, expected: {}".format(
-        str(input_stat),
-        str(network.predict(np.array(input_stat))),
-        str(int(correct_predict == 1))
-    ))
-
-print("\n")
+train = [
+    ([0, 1, 0], 0),
+]
 
 train2 = [
-    ([0, 1, 0], 0),
-    ([1, 1, 1], 1),
-    ([1, 0, 0], 0),
-    ([1, 0, 1], 0),
+    ([1, 1, 0], 1),
 ]
 
-for e in range(epochs):
-    inputs_ = []
-    correct_predictions = []
-    for input_stat, correct_predict in train2:
-        network.training(np.array(input_stat), correct_predict)
-        inputs_.append(np.array(input_stat))
-        correct_predictions.append(np.array(correct_predict))
 
-    train_loss = mse(network.predict(np.array(inputs_).T), np.array(correct_predictions))
-    sys.stdout.write(
-        "\rNewData. Progress: {}, Training loss: {}".format(str(100 * e / float(epochs))[:4], str(train_loss)[:5]))
+def print_predict(nw, study_set):
+    for e in range(epochs):
+        inputs_ = []
+        correct_predictions = []
+        for input_stat, correct_predict in study_set:
+            nw.training(np.array(input_stat), correct_predict)
+            inputs_.append(np.array(input_stat))
+            correct_predictions.append(np.array(correct_predict))
 
-print("\n")
+        train_loss = mse(nw.predict(np.array(inputs_).T), np.array(correct_predictions))
+        sys.stdout.write(
+            "\rProgress: {}, Training loss: {}".format(str(100 * e / float(epochs))[:4], str(train_loss)[:5]))
 
-for input_stat, correct_predict in train2:
-    print("NewData. For input: {} the prediction is: {}, expected: {}".format(
-        str(input_stat),
-        str(int(network.predict(np.array(input_stat)) > .5)),
-        str(int(correct_predict == 1))
-    ))
+    print("\n")
 
-print("\n")
+    for input_stat, correct_predict in study_set:
+        print("For input: {} the prediction is: {}, expected: {}".format(
+            str(input_stat),
+            str(int(nw.predict(np.array(input_stat)) > .5)),
+            str(int(correct_predict == 1))
+        ))
 
-for input_stat, correct_predict in train2:
-    print("NewData. For input: {} the prediction is: {}, expected: {}".format(
-        str(input_stat),
-        str(network.predict(np.array(input_stat))),
-        str(int(correct_predict == 1))
-    ))
+    print("\n")
 
-print("\n")
+    for input_stat, correct_predict in study_set:
+        print("For input: {} the prediction is: {}, expected: {}".format(
+            str(input_stat),
+            str(nw.predict(np.array(input_stat))),
+            str(int(correct_predict == 1))
+        ))
 
-train3 = [
-    ([0, 0, 0], 0),
-    ([1, 0, 1], 1),
-    ([1, 1, 1], 1),
-    ([1, 0, 0], 0),
-    ([0, 0, 1], 1),
-]
+    print("\n")
 
-for e in range(epochs):
-    inputs_ = []
-    correct_predictions = []
-    for input_stat, correct_predict in train3:
-        network.training(np.array(input_stat), correct_predict)
-        inputs_.append(np.array(input_stat))
-        correct_predictions.append(np.array(correct_predict))
 
-    train_loss = mse(network.predict(np.array(inputs_).T), np.array(correct_predictions))
-    sys.stdout.write(
-        "\rNewData 2: Progress: {}, Training loss: {}".format(str(100 * e / float(epochs))[:4], str(train_loss)[:5]))
-
-print("\n")
-
-for input_stat, correct_predict in train3:
-    print("NewData 2: For input: {} the prediction is: {}, expected: {}".format(
-        str(input_stat),
-        str(int(network.predict(np.array(input_stat)) > .5)),
-        str(int(correct_predict == 1))
-    ))
-
-print("\n")
-
-for input_stat, correct_predict in train3:
-    print("NewData 2: For input: {} the prediction is: {}, expected: {}".format(
-        str(input_stat),
-        str(network.predict(np.array(input_stat))),
-        str(int(correct_predict == 1))
-    ))
-
-print("\n")
+print_predict(network, train)
+print_predict(network, train2)
