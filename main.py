@@ -50,10 +50,20 @@ learning_rate = 0.08
 network = Brain(learning_rate=learning_rate)
 
 train = [
+    ([1, 1, 1], 1),
+    ([1, 1, 0], 0),
+    ([1, 0, 0], 1),
     ([0, 1, 0], 0),
 ]
 
 train2 = [
+    ([0, 1, 1], 0),
+    ([1, 0, 1], 1),
+    ([1, 1, 0], 0),
+]
+
+train3 = [
+    ([0, 0, 0], 0),
     ([1, 1, 0], 1),
 ]
 
@@ -94,3 +104,4 @@ def print_predict(nw, study_set):
 
 print_predict(network, train)
 print_predict(network, train2)
+print_predict(network, train3)
