@@ -39,6 +39,11 @@ class Brain(object):
         weights_delta_layer_1 = error_layer_1 * gradient_layer_1
         self.weights_0_1 -= (np.dot(inputs.reshape(len(inputs), 1), weights_delta_layer_1).T * self.learning_rate)
 
+    # The neural network thinks.
+    def think(self, inputs):
+        # Pass inputs through our neural network (our single neuron).
+        return self.sigmoid(np.dot(inputs, self.weights_0_1))
+
 
 def mse(y, Y):
     return np.mean((y - Y) ** 2)
@@ -102,6 +107,10 @@ def print_predict(nw, study_set):
     print("\n")
 
 
-print_predict(network, train)
-print_predict(network, train2)
-print_predict(network, train3)
+# print_predict(network, train)
+# print_predict(network, train2)
+# print_predict(network, train3)
+
+
+if __name__ == "__main__":
+    print(Brain.think(np.array([1, 0, 0])))
